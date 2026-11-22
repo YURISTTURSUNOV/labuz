@@ -62,3 +62,6 @@ Mavzu yoziladi, sayt AI uçun tayyor topşiriq (prompt) yaratadi, AI javobi (JSO
 - Ruxsat etilgan shablonlar: `sorter` (guruhlarga ajratiş), `timeline` (fe'l vaqtlari), `wordparts` (söz tarkibi).
 - Saqlangan kartalar har yuklanişda qayta tekşiriladi, `verified:false` majburiy, matn faqat textContent orqali çiqadi.
 - Yangi shablon qöşiş: `src/templates/<nom>.js`, `TEMPLATES` ga va `CUSTOM_TEMPLATES` (validate.js) ga qöşiladi.
+
+## Öqituvçi kodini almaştiriş
+`https://yuristtursunov.github.io/labuz/kod/` sahifasi yangi kod yaratadi (brauzerda, tarmoqsiz). Çiqqan matnni `docs/teacher.json` ga qöyib "Commit" qilinadi. Qöl bilan: `node tools/set-code.mjs`.

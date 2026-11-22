@@ -8,5 +8,5 @@ const code = norm(process.argv[2] || gen());
 if (code.length < 8) { console.error('Kod kamida 8 belgi bölishi kerak (qisqa kod tez buziladi)'); process.exit(1); }
 const salt = randomBytes(16).toString('hex'), iter = 200000;
 const hash = pbkdf2Sync(code, Buffer.from(salt, 'hex'), iter, 32, 'sha256').toString('hex');
-writeFileSync(new URL('../teacher.json', import.meta.url), JSON.stringify({ salt, hash, iter }));
+writeFileSync(new URL('../docs/teacher.json', import.meta.url), JSON.stringify({ salt, hash, iter }));
 console.log('KOD:', code.slice(0, 4) + '-' + code.slice(4));

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MSwEylWpqxz1/ciPDatffxP44DUsOKlLDO81G1nMA28='; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow">
+<title>LabUz: öqituvçi kodi yaratuvçi</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;background:#f6f3ec;color:#14213d;margin:0}main{max-width:640px;margin:0 auto;padding:28px 18px}
+h1{font-size:26px;margin:0 0 6px}.card{background:#fff;border:2px solid #e4ddcc;border-radius:16px;padding:18px;margin:16px 0}
+button,a.b{font:700 16px system-ui;background:#14213d;color:#fff;border:0;border-radius:12px;padding:12px 18px;cursor:pointer;text-decoration:none;display:inline-block;margin:4px 6px 4px 0}
+button.g,a.g{background:#fff;color:#14213d;border:2px solid #14213d}.code{font:800 40px ui-monospace,Consolas,monospace;letter-spacing:5px;margin:8px 0}
+textarea{width:100%;font:13px ui-monospace,Consolas,monospace;border:2px solid #e4ddcc;border-radius:10px;padding:10px;box-sizing:border-box}
+ol{padding-left:20px}.m{color:#5b6477;font-size:14px}#msg{color:#1f9d55;font-weight:700;min-height:24px}</style></head>
+<body><main><h1>🔑 Öqituvçi kodi yaratuvçi</h1>
+<p class="m">Bu sahifa kodni özingning brauzeringda yaratadi va hech qayerga yubormaydi. Yangi kod yaratilgach, eskisi ishlamay qoladi.</p>
+<div class="card"><button id="gen">Yangi kod yarat</button><div id="msg"></div>
+<div id="result" hidden><div class="code" id="code"></div><button class="g" id="copyCode">📋 Kodni nusxalaş</button>
+<ol><li>Kodni saqlab qöying (daftar yoki parol menejeri). Öquvçilarga bermang.</li>
+<li>Pastdagi matnni nusxalang: <button id="copyJson">📋 teacher.json ni nusxalaş</button></li>
+<li><a class="b g" href="https://github.com/YURISTTURSUNOV/labuz/edit/main/docs/teacher.json" target="_blank" rel="noopener">GitHub da oçish</a> Faylning hamma matnini öçirib, nusxalanganini qöying, "Commit changes" ni (ikki marta) bosing.</li>
+<li>1–10 daqiqadan keyin yangi kod ishlaydi.</li></ol>
+<textarea id="json" rows="3" readonly></textarea></div></div></main>
+<script>(()=>{var s="ABCDEFGHJKMNPQRSTUVWXYZ23456789",t=n=>document.getElementById(n),r=n=>[...new Uint8Array(n)].map(e=>e.toString(16).padStart(2,"0")).join("");function l(n=8){let e=[];for(;e.length<n;){let o=crypto.getRandomValues(new Uint8Array(16));for(let i of o)i<248&&e.length<n&&e.push(s[i%s.length])}return e.join("")}async function d(n){let e=crypto.getRandomValues(new Uint8Array(16)),a=2e5,o=await crypto.subtle.importKey("raw",new TextEncoder().encode(n),"PBKDF2",!1,["deriveBits"]),i=await crypto.subtle.deriveBits({name:"PBKDF2",salt:e,iterations:a,hash:"SHA-256"},o,256);return JSON.stringify({salt:r(e),hash:r(i),iter:a})}async function c(n,e){try{await navigator.clipboard.writeText(n),t("msg").textContent=e}catch{t("msg").textContent="Nusxalanmadi: matnni q\xF6l bilan belgilab Ctrl+C bosing"}}t("gen").addEventListener("click",async()=>{if(!(window.crypto&&crypto.subtle)){t("msg").textContent="Bu brauzer \u015Fifrlashni q\xF6llamaydi. Chrome yoki Safari da o\xE7ing.";return}t("gen").disabled=!0,t("msg").textContent="Yaratilmoqda\u2026";let n=l(),e=await d(n);t("code").textContent=n.slice(0,4)+"-"+n.slice(4),t("json").value=e,t("result").hidden=!1,t("gen").disabled=!1,t("gen").textContent="Yana yangi kod yarat",t("msg").textContent="Tayyor. Kodni hozir saqlab q\xF6ying: keyin ko\u2019ra olmaysiz."});t("copyCode").addEventListener("click",()=>c(t("code").textContent,"Kod nusxalandi"));t("copyJson").addEventListener("click",()=>c(t("json").value,"teacher.json matni nusxalandi. Endi GitHub tugmasini bosing"));})();
+</script></body></html>

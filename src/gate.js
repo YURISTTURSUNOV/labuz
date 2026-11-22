@@ -3,7 +3,9 @@ import { kv } from './store.js';
 
 // Öqituvçi kodi: faqat bolalarni qaytaradi. Kod saytda saqlanmaydi, faqat PBKDF2 xeşi turadi.
 // Diqqat: bu brauzer ichidagi to'siq, jiddiy himoya uçun server kerak.
-const CFG = typeof window !== 'undefined' ? window.LABUZ_TEACHER : null;
+let CFG = null; // docs/teacher.json dan o'qiladi: {salt, hash, iter}
+const okCfg = c => c && /^[0-9a-f]{32}$/.test(c.salt) && /^[0-9a-f]{64}$/.test(c.hash) && Number.isInteger(c.iter) && c.iter >= 100000 && c.iter <= 2000000;
+async function loadCfg() { try { const r = await fetch('teacher.json', { cache: 'no-store' }); const c = r.ok ? await r.json() : null; return okCfg(c) ? c : null; } catch (e) { return null; } }
 const TTL = 8 * 3600e3, KEY = 'labuz.tk';
 const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
 const unhex = s => new Uint8Array((s.match(/../g) || []).map(x => parseInt(x, 16)));
@@ -21,12 +23,14 @@ async function verify(code) {
 
 export function gateView(onOk) {
   const input = h('input', { type: 'password', autocomplete: 'off', maxlength: 20, placeholder: 'XXXX-XXXX', 'aria-label': 'Öqituvçi kodi' });
-  const msg = h('p', { class: 'muted' }, CFG && window.crypto && crypto.subtle ? 'Bu bölim öqituvçilar uçun. Kodni kiriting.' : 'Öqituvçi kodi sozlanmagan, bölim yopiq.');
+  const msg = h('p', { class: 'muted' }, window.crypto && crypto.subtle ? 'Bu bölim öqituvçilar uçun. Kodni kiriting.' : 'Bu brauzer şifrlashni qöllamaydi, bölim yopiq.');
   const btn = h('button', { class: 'btn', type: 'button' }, 'Kirish');
   const go = async () => {
-    if (!CFG || !(window.crypto && crypto.subtle)) return;
+    if (!(window.crypto && crypto.subtle)) return;
     const code = input.value.toUpperCase().replace(/[\s-]/g, '');
     btn.disabled = true; msg.textContent = 'Tekşirilmoqda…';
+    CFG = await loadCfg();
+    if (!CFG) { btn.disabled = false; msg.textContent = 'Sozlama yuklanmadi. Birozdan keyin qayta urining.'; return; }
     if (fails >= 3) await new Promise(r => setTimeout(r, Math.min(2 ** (fails - 2), 30) * 1000));
     let ok = false; try { ok = code.length >= 8 && await verify(code); } catch (e) { ok = false; }
     btn.disabled = false;
