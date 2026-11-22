@@ -1,5 +1,5 @@
 import { h } from '../util.js';
-import { slider, setFocusOn, fitCanvas } from './common.js';
+import { slider, setFocusOn, fitCanvas, setRead } from './common.js';
 
 // Shablon: sabab-oqibat simulyatsiyasi (Om qonuni). Tok deterministik hisoblanadi: I = U / R.
 export function mount(el, params, { onState }) {
@@ -80,7 +80,7 @@ export function mount(el, params, { onState }) {
   }
   function update() {
     state.I = state.U / state.R; state.burn = state.I > maxI;
-    read.innerHTML = `<b>I = U / R = ${state.U} / ${state.R} = ${String(Math.round(state.I * 100) / 100).replace('.', ',')} A</b><span>${state.burn ? 'Ortiqça yuklanish' : 'Normal rejim'}</span>`;
+    setRead(read, `I = U / R = ${state.U} / ${state.R} = ${String(Math.round(state.I * 100) / 100).replace('.', ',')} A`, state.burn ? 'Ortiqça yuklanish' : 'Normal rejim');
     onState({ ...state });
   }
   update(); frame();

@@ -1,4 +1,5 @@
 import { h } from '../util.js';
+import { setRead } from './common.js';
 
 // Shablon: söz bölaklarga ajratiş va rol berish (morfema tahlili). Qoida deterministik, AI uydirmaydi.
 export function mount(el, params, { onState }) {
@@ -35,7 +36,7 @@ export function mount(el, params, { onState }) {
     });
     state.parts = parts.join('|');
     state.roles = ids.join('|');
-    read.innerHTML = `<b>${parts.join(' + ')}</b><span>${parts.length} bölak</span>`;
+    setRead(read, parts.join(' + '), `${parts.length} bölak`);
     onState({ ...state });
   }
   function emit() {

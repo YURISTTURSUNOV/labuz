@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { h } from '../util.js';
+import { setRead } from './common.js';
 
 // Shablon: 3D model + bölaklarni tanlaş. Boşqa 3D mavzular uçun PARTS ni almaştirsa yetadi.
 export const PARTS = {
@@ -69,9 +70,8 @@ export function mount(el, params, { onState, ctx }) {
       if (o.material && k === 'membrana') o.material.opacity = k === id ? 0.32 : 0.16;
     }));
     const p = id && PARTS[id];
-    info.innerHTML = p
-      ? (hideNames ? '<b>Tanlandi</b><span>Imtihon rejimida nomi körsatilmaydi.</span>' : `<b>${p.name}</b><span>${p.info}</span>`)
-      : '<b>Organoidni bosing</b><span>Modelni sichqoncha (yoki barmoq) bilan aylantiring.</span>';
+    if (p) hideNames ? setRead(info, 'Tanlandi', 'Imtihon rejimida nomi körsatilmaydi.') : setRead(info, p.name, p.info);
+    else setRead(info, 'Organoidni bosing', 'Modelni sichqoncha (yoki barmoq) bilan aylantiring.');
     list.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === id));
     onState({ ...state });
   }

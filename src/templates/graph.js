@@ -1,5 +1,5 @@
 import { h } from '../util.js';
-import { slider, setFocusOn, fitCanvas } from './common.js';
+import { slider, setFocusOn, fitCanvas, setRead } from './common.js';
 
 // Shablon: grafik (y = kx + b). Ko'rinish, slayder oraliqlari, yorliqlar va belgi (emoji) params orqali beriladi.
 const DEF = {
@@ -58,7 +58,7 @@ export function mount(el, params, { onState }) {
   function update() {
     const y = state.k * state.x + state.b;
     const t = P.pointFmt.replace('{x}', state.x).replace('{y}', num(y));
-    eq.innerHTML = `<b>${eqText()}</b><span>${t}</span>`;
+    setRead(eq, eqText(), t);
     fitter.fit(); onState({ ...state });
   }
   update();

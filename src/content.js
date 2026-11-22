@@ -126,6 +126,33 @@ export const CARDS = [
       { emoji: '🏫', text: 'She ___ to school yesterday.', hint: 'Notöğri fe\u2019l: özining maxsus past şakli bor.', ask: { kind: 'choice', options: ['goed', 'went', 'gone'], correct: 1 } },
     ],
   },
+  {
+    id: 'bio-hayvon-guruhlari', subject: 'biologiya', grade: 5, verified: false, source: null, emoji: '🐬',
+    topic: 'Hayvonlar guruhlari',
+    template: 'sorter',
+    params: {
+      cats: [{ id: 'sut', label: 'Sutemizuvçilar', emoji: '🐕' }, { id: 'qush', label: 'Quşlar', emoji: '🐦' }, { id: 'baliq', label: 'Baliqlar', emoji: '🐟' }],
+      items: [
+        { text: 'It', emoji: '🐕', cat: 'sut' }, { text: 'Burgut', emoji: '🦅', cat: 'qush' }, { text: 'Akula', emoji: '🦈', cat: 'baliq' },
+        { text: 'Delfin', emoji: '🐬', cat: 'sut' }, { text: 'Pingvin', emoji: '🐧', cat: 'qush' }, { text: 'Körşapalak', emoji: '🦇', cat: 'sut' },
+      ],
+    },
+    vars: {},
+    hook: {
+      q: 'Delfin suvda yaşaydi va baliqdek suzadi. U baliqmi?',
+      options: ['Ha, baliq', 'Yöq, sutemizuvçi', 'Yöq, qurbaqa'], correct: 1,
+      why: 'Delfin bolasini sut bilan boqadi va öpka bilan nafas oladi, şuning uçun u sutemizuvçi.',
+    },
+    claims: ['Sutemizuvçilar bolasini sut bilan boqadi va öpka bilan nafas oladi. Baliqlar jabra bilan nafas oladi. Quşlarning tanasi patlar bilan qoplangan.'],
+    discovery: 'Hayvon qayerda yaşaşi emas, tana tuzilişi uni guruhga kiritadi: delfin suvda yaşasa ham, körşapalak uçsa ham sutemizuvçi.',
+    explore: ['Hayvonni tanlab, guruhga joylang.', 'Xato joylaşganini qayta bosib, qaytarib oling.'],
+    steps: [
+      { emoji: '🧺', text: 'Kamida 3 ta hayvonni töğri guruhga joylang.', hint: 'Hayvonni bosing, keyin guruhni bosing.', focus: 'pool', check: [['correct', '>=', 3]] },
+      { emoji: '🍼', text: 'Delfin bolasini nima bilan boqadi?', hint: 'Sutemizuvçi nomiga qarang.', ask: { kind: 'choice', options: ['Sut', 'Baliq ikrasi', 'Plankton'], correct: 0 } },
+      { emoji: '🫁', text: 'Delfin qanday nafas oladi?', hint: 'U suv yuzasiga çiqib nafas oladi.', ask: { kind: 'choice', options: ['Jabra bilan', 'Öpka bilan', 'Teri bilan'], correct: 1 } },
+      { emoji: '🏁', text: 'Hammasini töğri joylang. Delfin va körşapalak qaysi guruhga ketadi?', hint: 'Körşapalak uçadi, lekin bolasini sut bilan boqadi.', focus: 'buckets', check: [['done', '==', 'yes']] },
+    ],
+  },
 ];
 
 export const byId = id => CARDS.find(c => c.id === id);

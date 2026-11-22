@@ -4,17 +4,21 @@ import { SUBJECTS, SOON, CARDS, byId, nextOf } from './content.js';
 import { Runner } from './engine.js';
 import { pushEvent, kv } from './store.js';
 import { renderTeacher } from './teacher.js';
+import { renderAuthor } from './author.js';
+import { loadCustom, dropPreviews } from './custom.js';
 import { sfx, confetti, toast, addXP, getXP, fmtXP, isMuted, toggleMute, getStars, setStars, getStreak, touchStreak } from './fx.js';
 import * as graph from './templates/graph.js';
 import * as circuit from './templates/circuit.js';
 import * as cell3d from './templates/cell3d.js';
 import * as wordparts from './templates/wordparts.js';
 import * as timeline from './templates/timeline.js';
+import * as sorter from './templates/sorter.js';
 
-const TEMPLATES = { graph, circuit, cell3d, wordparts, timeline };
+const TEMPLATES = { graph, circuit, cell3d, wordparts, timeline, sorter };
 const MODES = [['quest', 'Sarguzasht'], ['free', 'Özing qil'], ['exam', 'Imtihon']];
 
 document.head.append(h('style', {}, styles));
+loadCustom();
 const app = document.getElementById('app');
 let cleanup = null;
 const user = () => ({ name: kv.get('labuz.name') || '', code: kv.get('labuz.code') || 'SINF-7A' });
@@ -24,7 +28,7 @@ function header(route) {
   const mute = h('button', { class: 'iconbtn', 'aria-label': 'Ovoz', onclick: () => { mute.textContent = toggleMute() ? '🔇' : '🔊'; } }, isMuted() ? '🔇' : '🔊');
   return h('header', { class: 'top' },
     h('a', { class: 'logo', href: '#/' }, h('span', { class: 'mark' }, '◐'), 'LabUz'),
-    h('nav', {}, h('a', { href: '#/', class: route !== 'teacher' ? 'on' : '' }, 'Öquvçi'), h('a', { href: '#/teacher', class: route === 'teacher' ? 'on' : '' }, 'Öqituvçi')),
+    h('nav', {}, h('a', { href: '#/', class: route !== 'teacher' && route !== 'author' ? 'on' : '' }, 'Öquvçi'), h('a', { href: '#/teacher', class: route === 'teacher' ? 'on' : '' }, 'Öqituvçi'), h('a', { href: '#/author', class: route === 'author' ? 'on' : '' }, 'Karta tuzuvçi')),
     h('span', { class: 'who' }, u.name && getStreak().n > 0 ? h('span', { class: 'streak streakval', title: 'Ketma-ket kunlar' }, `🔥 ${getStreak().n}`) : null, u.name ? h('span', { class: 'xp xpval' }, fmtXP(getXP())) : 'Prototip'), mute);
 }
 
@@ -49,7 +53,7 @@ function home() {
       const s = SUBJECTS[c.subject];
       return h('a', { class: 'card', href: `#/card/${c.id}`, style: `--c:${s.color}` },
         h('div', { class: 'ico' }, c.emoji),
-        h('div', { class: 'meta' }, `${s.name} · ${c.grade}-sinf`, h('em', {}, 'namuna')),
+        h('div', { class: 'meta' }, `${s.name} · ${c.grade}-sinf`, h('em', {}, c.custom ? 'AI qoralama' : 'namuna')),
         h('h3', {}, c.topic),
         h('p', { class: 'q' }, '❓ ' + c.hook.q),
         h('div', { class: 'foot' }, h('span', {}, getStars(c.id) ? '⭐'.repeat(getStars(c.id)) + ' Qayta ▶' : 'Taxmin qil ▶'), h('span', {}, `${c.steps.length} missiya`)));
@@ -202,6 +206,8 @@ function route() {
   const [path, q] = location.hash.replace(/^#/, '').split('?');
   const mode = new URLSearchParams(q || '').get('mode') || 'quest';
   const m = path.match(/^\/card\/(.+)$/);
+  if (path === '/author') { app.append(header('author'), renderAuthor()); return; }
+  if (!m) dropPreviews();
   if (path === '/teacher') {
     const view = h('div', {}); app.append(header('teacher'), view); cleanup = renderTeacher(view, user().code); return;
   }

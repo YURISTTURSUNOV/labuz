@@ -56,3 +56,9 @@ onState har özgarişda joriy holat obyektini beradi. main.js dagi TEMPLATES ga 
 Tayyor sayt `docs/index.html` da. Repo Settings, Pages, Source: "Deploy from a branch", Branch: main, Folder: /docs.
 Qayta qurish: `npm install && node build.mjs` (docs/ va dist/ yangilanadi).
 AI server ulaş: `LABUZ_AI_ENDPOINT=https://server.uz/api/hint node build.mjs` (CSP avtomatik yangilanadi).
+
+## v4: Karta tuzuvçi (#/author)
+Mavzu yoziladi, sayt AI uçun tayyor topşiriq (prompt) yaratadi, AI javobi (JSON) şu yerga qöyiladi, `src/validate.js` tekşiradi, sayt sinab köрsatadi va brauzerda saqlaydi.
+- Ruxsat etilgan shablonlar: `sorter` (guruhlarga ajratiş), `timeline` (fe'l vaqtlari), `wordparts` (söz tarkibi).
+- Saqlangan kartalar har yuklanişda qayta tekşiriladi, `verified:false` majburiy, matn faqat textContent orqali çiqadi.
+- Yangi shablon qöşiş: `src/templates/<nom>.js`, `TEMPLATES` ga va `CUSTOM_TEMPLATES` (validate.js) ga qöşiladi.

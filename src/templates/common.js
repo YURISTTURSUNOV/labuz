@@ -29,3 +29,8 @@ export function fitCanvas(canvas, heightCss, redraw) {
   const ro = new ResizeObserver(fit); ro.observe(canvas.parentElement); fit();
   return { fit, stop: () => ro.disconnect() };
 }
+
+// Xavfsiz "o'qilma" satri: matn faqat textContent orqali qöyiladi (innerHTML yöq)
+export function setRead(el, bold, small) {
+  el.replaceChildren(h('b', {}, bold), h('span', {}, small));
+}
