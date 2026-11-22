@@ -194,3 +194,5 @@ h1,h2,h3,h4{font-family:ui-rounded,"Segoe UI",system-ui,sans-serif;line-height:1
 .row{display:flex;gap:10px;flex-wrap:wrap}.btn.sm{padding:6px 10px;font-size:13px}
 .mlist{display:flex;flex-direction:column;gap:8px}.mrow{display:flex;gap:8px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 12px}.mrow span{flex:1}
 @media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.gate{max-width:480px;margin:60px auto}.gate input{font:700 20px ui-monospace,Consolas,monospace;letter-spacing:3px;text-transform:uppercase;padding:12px;border:2px solid var(--line);border-radius:12px;width:100%}
+.tfoot{text-align:center;margin:30px 0 10px;font-size:13px}.tfoot a{color:var(--mut)}

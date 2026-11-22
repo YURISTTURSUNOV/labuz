@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 // Ixtiyoriy AI server: LABUZ_AI_ENDPOINT=https://server.uz/api/hint node build.mjs
@@ -12,7 +12,10 @@ const r = await build({
   loader: { '.css': 'text' }, target: 'es2020', legalComments: 'none',
 });
 const js = r.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
-const cfg = ep ? `window.LABUZ_AI_ENDPOINT=${JSON.stringify(ep)};` : '/* AI server ulanmagan: mahalliy maslahat ishlaydi */';
+const teacher = existsSync('teacher.json') ? JSON.parse(readFileSync('teacher.json', 'utf8')) : null;
+if (!teacher) console.warn('DIQQAT: teacher.json yöq, öqituvçi bölimlari yopiq qoladi. node tools/set-code.mjs ni ishga tushiring.');
+const cfg = (teacher ? `window.LABUZ_TEACHER=${JSON.stringify({ salt: teacher.salt, hash: teacher.hash, iter: teacher.iter })};` : '')
+  + (ep ? `window.LABUZ_AI_ENDPOINT=${JSON.stringify(ep)};` : '/* AI server ulanmagan: mahalliy maslahat ishlaydi */');
 const hash = s => `'sha256-${createHash('sha256').update(s, 'utf8').digest('base64')}'`;
 const csp = [
   "default-src 'none'",

@@ -5,6 +5,7 @@ import { Runner } from './engine.js';
 import { pushEvent, kv } from './store.js';
 import { renderTeacher } from './teacher.js';
 import { renderAuthor } from './author.js';
+import { gateView, isUnlocked, lock } from './gate.js';
 import { loadCustom, dropPreviews } from './custom.js';
 import { sfx, confetti, toast, addXP, getXP, fmtXP, isMuted, toggleMute, getStars, setStars, getStreak, touchStreak } from './fx.js';
 import * as graph from './templates/graph.js';
@@ -28,7 +29,9 @@ function header(route) {
   const mute = h('button', { class: 'iconbtn', 'aria-label': 'Ovoz', onclick: () => { mute.textContent = toggleMute() ? '🔇' : '🔊'; } }, isMuted() ? '🔇' : '🔊');
   return h('header', { class: 'top' },
     h('a', { class: 'logo', href: '#/' }, h('span', { class: 'mark' }, '◐'), 'LabUz'),
-    h('nav', {}, h('a', { href: '#/', class: route !== 'teacher' && route !== 'author' ? 'on' : '' }, 'Öquvçi'), h('a', { href: '#/teacher', class: route === 'teacher' ? 'on' : '' }, 'Öqituvçi'), h('a', { href: '#/author', class: route === 'author' ? 'on' : '' }, 'Karta tuzuvçi')),
+    h('nav', {}, h('a', { href: '#/', class: route !== 'teacher' && route !== 'author' ? 'on' : '' }, 'Öquvçi'),
+      ...(isUnlocked() ? [h('a', { href: '#/teacher', class: route === 'teacher' ? 'on' : '' }, 'Öqituvçi'), h('a', { href: '#/author', class: route === 'author' ? 'on' : '' }, 'Karta tuzuvçi'),
+        h('a', { href: '#/', onclick: () => { lock(); } }, '🔒 Çiqiş')] : [])),
     h('span', { class: 'who' }, u.name && getStreak().n > 0 ? h('span', { class: 'streak streakval', title: 'Ketma-ket kunlar' }, `🔥 ${getStreak().n}`) : null, u.name ? h('span', { class: 'xp xpval' }, fmtXP(getXP())) : 'Prototip'), mute);
 }
 
@@ -67,6 +70,7 @@ function home() {
     h('div', { class: 'progress' }, h('b', {}, `${CARDS.filter(c => getStars(c.id)).length}/${CARDS.length}`), ' mavzu tugatilgan'),
     chips, grid,
     h('section', { class: 'soon' }, h('h4', {}, 'Tez kunda'), h('div', { class: 'chips' }, SOON.map(t => h('span', { class: 'chip dis' }, t)))),
+    h('p', { class: 'muted tfoot' }, h('a', { href: '#/teacher' }, '🔒 Öqituvçi kirişi')),
     h('p', { class: 'muted note' }, 'Prototip. Sinf va mavzular darslik bilan hali tekşirilmagan, kontentni fan metodisti tasdiqlaşi kerak.'));
 }
 
@@ -206,6 +210,7 @@ function route() {
   const [path, q] = location.hash.replace(/^#/, '').split('?');
   const mode = new URLSearchParams(q || '').get('mode') || 'quest';
   const m = path.match(/^\/card\/(.+)$/);
+  if ((path === '/author' || path === '/teacher') && !isUnlocked()) { app.append(header('home'), gateView(route)); return; }
   if (path === '/author') { app.append(header('author'), renderAuthor()); return; }
   if (!m) dropPreviews();
   if (path === '/teacher') {
