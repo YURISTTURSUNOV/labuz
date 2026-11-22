@@ -13,7 +13,7 @@ export function mount(el, params, { onState }) {
   el.append(root);
 
   let phase = 0, raf = 0, W = 600, H = 340, alive = true;
-  const fitter = fitCanvas(canvas, 340, (g, w, hh) => { W = w; H = hh; });
+  const fitter = fitCanvas(canvas, 340, (g, w, hh) => { W = w; H = hh; }, 1.1);
 
   function path(t) { // 0..1 sirtmoq bo'ylab nuqta (to'rtburçak)
     const x0 = 60, x1 = W - 60, y0 = 70, y1 = H - 60;
@@ -48,11 +48,6 @@ export function mount(el, params, { onState }) {
     g.beginPath(); g.moveTo(x0 - 22, by - 8); g.lineTo(x0 + 22, by - 8); g.stroke();
     g.lineWidth = 9; g.beginPath(); g.moveTo(x0 - 12, by + 10); g.lineTo(x0 + 12, by + 10); g.stroke();
     g.fillStyle = '#5b5646'; g.textAlign = 'left'; g.fillText(`U = ${state.U} V`, x0 + 30, by + 4);
-    // ampermetr
-    const ax = x1, ay = (y0 + y1) / 2;
-    g.fillStyle = '#fff'; g.strokeStyle = '#14213D'; g.lineWidth = 3; g.beginPath(); g.arc(ax, ay, 26, 0, 7); g.fill(); g.stroke();
-    g.fillStyle = state.burn ? '#E4572E' : '#14213D'; g.font = 'bold 14px system-ui'; g.textAlign = 'center';
-    g.fillText('A', ax, ay - 4); g.font = '12px system-ui'; g.fillText(`${String(Math.round(state.I * 100) / 100).replace('.', ',')}`, ax, ay + 12);
     // chiroq: yorqinligi tok kuçiga mos
     const bright = Math.min(state.I / maxI, 1), bx = W / 2, byy = y1;
     if (!state.burn) {
@@ -72,9 +67,15 @@ export function mount(el, params, { onState }) {
     phase = (phase + sp) % 1;
     g.fillStyle = '#FCA311';
     for (let i = 0; i < 28; i++) { const [px, py] = path(phase + i / 28); g.beginPath(); g.arc(px, py, 5, 0, 7); g.fill(); }
+    // ampermetr
+    const ax = x1, ay = (y0 + y1) / 2;
+    g.fillStyle = '#fff'; g.strokeStyle = '#14213D'; g.lineWidth = 3; g.beginPath(); g.arc(ax, ay, 27, 0, 7); g.fill(); g.stroke();
+    g.fillStyle = state.burn ? '#E4572E' : '#14213D'; g.font = 'bold 14px system-ui'; g.textAlign = 'center';
+    g.fillText('A', ax, ay - 4); g.font = '12px system-ui'; g.fillText(`${String(Math.round(state.I * 100) / 100).replace('.', ',')}`, ax, ay + 12);
     if (state.burn) {
-      g.fillStyle = '#E4572E'; g.font = 'bold 15px system-ui'; g.textAlign = 'center';
-      g.fillText('HIMOYA: tok kuçi juda katta! Haqiqiy simda qizib ketardi.', W / 2, 30);
+      g.fillStyle = '#E4572E'; g.textAlign = 'center';
+      g.font = 'bold 14px system-ui'; g.fillText('HIMOYA: tok kuçi juda katta!', W / 2, 24);
+      g.font = '12px system-ui'; g.fillText('Haqiqiy simda qizib ketardi.', W / 2, 42);
     }
     raf = requestAnimationFrame(frame);
   }

@@ -17,9 +17,10 @@ export function setFocusOn(root, name) {
 }
 
 // Canvasni konteyner eniga moslaş (DPR bilan)
-export function fitCanvas(canvas, heightCss, redraw) {
+export function fitCanvas(canvas, maxHeight, redraw, ratio = 1.2) {
   const fit = () => {
     const w = canvas.parentElement.clientWidth || 600;
+    const heightCss = Math.min(maxHeight, Math.round(w * ratio)); // tor ekranda kanvas juda balandlaşmasin
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.style.width = w + 'px'; canvas.style.height = heightCss + 'px';
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(heightCss * dpr);

@@ -22,7 +22,9 @@ export function mount(el, params, { onState, ctx }) {
   const root = h('div', { class: 'tpl' }, canvasWrap, info, list);
   el.append(root);
 
-  const W = () => canvasWrap.clientWidth || 600, Ht = 400;
+  const W = () => canvasWrap.clientWidth || 600;
+  const Hf = () => Math.min(400, Math.round(W() * 1.05));
+  let Ht = Hf();
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(W(), Ht);
@@ -102,7 +104,7 @@ export function mount(el, params, { onState, ctx }) {
     raf = requestAnimationFrame(loop);
   };
   const ro = new ResizeObserver(() => {
-    const w = W(); renderer.setSize(w, Ht); camera.aspect = w / Ht; camera.updateProjectionMatrix();
+    const w = W(); Ht = Hf(); renderer.setSize(w, Ht); camera.aspect = w / Ht; camera.updateProjectionMatrix();
     // tor ekranda (telefon) kamerani uzoqlaştirib, hujayra to'liq sığişini ta'minlaymiz
     camera.position.setLength(Math.max(8.5, 4.3 / (0.4142 * camera.aspect))); controls.update();
   });

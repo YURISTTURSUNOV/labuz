@@ -18,7 +18,7 @@ export function mount(el, params, { onState }) {
   const mk = n => { const [mn, mx, st] = P.ranges[n]; return slider({ name: n, label: P.labels[n], min: mn, max: mx, step: st, value: state[n], onInput: v => { state[n] = v; update(); } }); };
   const root = h('div', { class: 'tpl' }, h('div', { class: 'cvwrap' }, canvas), eq, h('div', { class: 'controls' }, mk('k').el, mk('b').el, mk('x').el));
   el.append(root);
-  const fitter = fitCanvas(canvas, 380, draw);
+  const fitter = fitCanvas(canvas, 380, draw, 1.0);
 
   function eqText() {
     const k = state.k, b = state.b;

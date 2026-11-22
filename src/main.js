@@ -27,8 +27,8 @@ const user = () => ({ name: kv.get('labuz.name') || '', code: kv.get('labuz.code
 function header(route) {
   const u = user();
   const mute = h('button', { class: 'iconbtn', 'aria-label': 'Ovoz', onclick: () => { mute.textContent = toggleMute() ? '🔇' : '🔊'; } }, isMuted() ? '🔇' : '🔊');
-  return h('header', { class: 'top' },
-    h('a', { class: 'logo', href: '#/' }, h('span', { class: 'mark' }, '◐'), 'LabUz'),
+  return h('header', { class: 'top' + (isUnlocked() ? ' many' : '') },
+    h('a', { class: 'logo', href: '#/' }, h('span', { class: 'mark' }, '◐'), h('span', { class: 'lt' }, 'LabUz')),
     h('nav', {}, h('a', { href: '#/', class: route !== 'teacher' && route !== 'author' ? 'on' : '' }, 'Öquvçi'),
       ...(isUnlocked() ? [h('a', { href: '#/teacher', class: route === 'teacher' ? 'on' : '' }, 'Öqituvçi'), h('a', { href: '#/author', class: route === 'author' ? 'on' : '' }, 'Karta tuzuvçi'),
         h('a', { href: '#/', onclick: () => { lock(); } }, '🔒 Çiqiş')] : [])),
@@ -79,7 +79,7 @@ function cardPage(id, mode) {
   if (!card) return { el: h('div', { class: 'page' }, h('p', {}, 'Karta topilmadi.'), h('a', { href: '#/' }, 'Orqaga')), destroy() {} };
   const s = SUBJECTS[card.subject], u = user();
   const body = h('div', { class: 'body' });
-  let runner = null, tpl = null, pick = null, side = null, finaleTimer = 0, lastHints = 0, xpGained = 0, nudgeT = 0, lastHint = null;
+  let runner = null, tpl = null, pick = null, side = null, mbar = null, stageEl = null, lastScrollIdx = -1, finaleTimer = 0, lastHints = 0, xpGained = 0, nudgeT = 0, lastHint = null;
 
   const hooks = {
     emit: e => {
@@ -118,6 +118,7 @@ function cardPage(id, mode) {
     destroyTpl();
     side = h('aside', { class: 'side' });
     const stage = h('section', { class: 'stage' });
+    mbar = h('div', { class: 'mbar' }); stage.append(mbar); stageEl = stage; lastScrollIdx = -1;
     body.replaceChildren(h('div', { class: 'split' }, side, stage));
     runner = new Runner(card, mode, hooks); lastHints = 0;
     tpl = TEMPLATES[card.template].mount(stage, card.params || {}, { onState: st => runner && runner.onState(st), ctx: { hideNames: mode === 'exam' } });
@@ -126,16 +127,33 @@ function cardPage(id, mode) {
     renderMission();
   }
 
+  const narrow = () => window.matchMedia('(max-width:900px)').matches;
+  const smooth = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+  function setBar(text, askStep) {
+    if (!mbar) return;
+    const kids = [h('span', { class: 'mtxt' }, text)];
+    if (askStep) kids.push(h('button', { class: 'mgo', onclick: () => side.scrollIntoView({ behavior: smooth(), block: 'start' }) }, 'Savol ↓'));
+    mbar.replaceChildren(...kids);
+  }
+  // telefonda model tepada, missiya pastda: yangi missiyada tegişli joyga özi siljiydi
+  function followStep(askStep) {
+    if (!narrow() || !runner || runner.idx === lastScrollIdx) return;
+    lastScrollIdx = runner.idx;
+    setTimeout(() => { const t = askStep ? side : stageEl; if (t && t.isConnected) t.scrollIntoView({ behavior: smooth(), block: 'start' }); }, 250);
+  }
+
   function renderMission() {
     if (!side || !runner) return;
     if (mode === 'free') {
+      setBar('🧪 Erkin tajriba: modelni sinab köring', false);
       side.replaceChildren(h('div', { class: 'mission' }, h('small', {}, 'Erkin tajriba'), h('h3', {}, 'Qanday qiziq natija chiqarasan?'),
         h('ul', { class: 'explore' }, card.explore.map(t => h('li', {}, t))),
         h('a', { class: 'btn', href: `#/card/${id}?mode=quest` }, 'Missiyaga qaytish ▶')));
       return;
     }
-    if (runner.finished) { side.replaceChildren(h('div', { class: 'mission win' }, h('div', { class: 'bigemoji' }, '🎉'), h('h3', {}, 'Barça missiyalar bajarildi!'))); return; }
+    if (runner.finished) { setBar('🎉 Barça missiyalar bajarildi!', false); side.replaceChildren(h('div', { class: 'mission win' }, h('div', { class: 'bigemoji' }, '🎉'), h('h3', {}, 'Barça missiyalar bajarildi!'))); return; }
     const st = runner.step, n = runner.total;
+    setBar(`${st.emoji} ${st.text}`, !!st.ask); followStep(!!st.ask);
     const dots = h('div', { class: 'dots' }, card.steps.map((_, i) => h('i', { class: i < runner.idx ? 'd' : i === runner.idx ? 'c' : '' })));
     const ctrls = [];
     if (st.ask) {
@@ -150,7 +168,7 @@ function cardPage(id, mode) {
       }
       if (runner.wrong.size || (a.kind === 'number' && runner.errors > 0)) ctrls.push(h('div', { class: 'wrong' }, 'Yaqin! Yana bir urinib köring 💪'));
     } else if (mode !== 'exam') {
-      ctrls.push(h('div', { class: 'doit' }, '👉 Öng tarafdagi modelni özingiz sinab köring'));
+      ctrls.push(h('div', { class: 'doit' }, '👉 Modelni özingiz sinab köring'));
     }
     if (mode === 'quest') {
       const hintBox = h('div', { class: 'hintbox' });
@@ -203,8 +221,12 @@ function cardPage(id, mode) {
   return { el, destroy: destroyTpl };
 }
 
-function route() {
+const syncHH = () => { const t = document.querySelector('.top'); if (t) document.documentElement.style.setProperty('--hh', t.offsetHeight + 'px'); };
+window.addEventListener('resize', syncHH);
+function route() { routeInner(); requestAnimationFrame(syncHH); }
+function routeInner() {
   document.querySelectorAll('.modal').forEach(n => n.remove());
+  mbar = null; stageEl = null;
   if (cleanup) { cleanup(); cleanup = null; }
   app.replaceChildren();
   const [path, q] = location.hash.replace(/^#/, '').split('?');

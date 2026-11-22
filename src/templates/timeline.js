@@ -12,7 +12,7 @@ const DEFAULT = {
       note: { past: 'Notöğri fe’l: -ed emas, özining maxsus şakli bor.', present: 'He/she/it bilan -es qöşiladi.', future: 'will + fe’lning asosiy şakli.' } },
   },
 };
-const TIMES = [['past', '⏪', 'Kecha', 'Past Simple', 16], ['present', '⏺', 'Har kuni', 'Present Simple', 50], ['future', '⏩', 'Ertaga', 'Future Simple', 84]];
+const TIMES = [['past', '⏪', 'Kecha', 'Past Simple', 16], ['present', '🔁', 'Har kuni', 'Present Simple', 50], ['future', '⏩', 'Ertaga', 'Future Simple', 84]];
 const GENERIC = { past: 'Past Simple: ötgan zamon şakli.', present: 'Present Simple: odatiy, takrorlanuvçi ish.', future: 'Future Simple: will + fe’l.' };
 
 export function mount(el, params, { onState, ctx }) {
